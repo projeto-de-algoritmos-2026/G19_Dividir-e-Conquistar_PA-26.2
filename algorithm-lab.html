@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Arena de Encontros — Laboratório</title>
+
+  <link rel="stylesheet" href="./styles/lab.css">
+</head>
+
+<body>
+  <main class="lab">
+    <header>
+      <h1>Laboratório de algoritmos</h1>
+      <p>Encontre o par de personagens mais próximo.</p>
+    </header>
+
+    <section class="toolbar" aria-label="Controles">
+      <label for="scenario">Cenário:</label>
+
+      <select id="scenario">
+        <option value="cross">Par entre as metades</option>
+        <option value="vertical">Pontos na vertical</option>
+        <option value="duplicate">Posições repetidas</option>
+      </select>
+
+      <button id="run" type="button">Executar algoritmo</button>
+
+      <label for="point-count">Pontos aleatórios:</label>
+
+        <input
+        id="point-count"
+        type="number"
+        min="2"
+        max="500"
+        value="100"
+        step="1"
+        >
+
+        <button id="generate" type="button">
+        Gerar pontos
+        </button>
+
+        <button id="benchmark" type="button">
+        Comparar algoritmos
+        </button>
+
+        <button id="visual-compare" type="button">
+        Comparação visual
+        </button>
+    </section>
+
+    <canvas
+      id="arena"
+      width="800"
+      height="500"
+      aria-label="Arena com pontos e destaque do par mais próximo"
+    ></canvas>
+
+    <section class="toolbar" aria-label="Reprodução do algoritmo">
+        <button id="step-reset" type="button">Início</button>
+        <button id="step-back" type="button">Anterior</button>
+        <button id="step-next" type="button">Próximo</button>
+        <button id="step-play" type="button">Reproduzir</button>
+
+        <span id="step-counter">Sem execução</span>
+    </section>
+
+<p id="step-description" aria-live="polite">
+  Execute o algoritmo para visualizar suas etapas.
+</p>
+
+<section class="comparison-panel" aria-labelledby="visual-comparison-title">
+  <h2 id="visual-comparison-title">Comparação visual</h2>
+
+  <div class="comparison-controls" aria-label="Controles da comparação visual">
+    <button id="comparison-reset" type="button">Reiniciar comparação</button>
+    <button id="comparison-play" type="button">Reproduzir</button>
+
+    <label for="comparison-speed">Velocidade:</label>
+    <select id="comparison-speed">
+      <option value="1000">Lenta</option>
+      <option value="700" selected>Normal</option>
+      <option value="300">Rápida</option>
+    </select>
+  </div>
+
+  <p id="comparison-status" aria-live="polite">
+    Clique em “Comparação visual” para preparar a animação.
+  </p>
+
+  <div class="comparison-grid">
+    <section class="algorithm-card algorithm-card-brute" aria-labelledby="visual-brute-title">
+      <h3 id="visual-brute-title">Força bruta <span class="legend-orange">●</span></h3>
+      <p>Comparações exibidas: <strong id="visual-bf-checks">0</strong></p>
+      <p>Par atual: <strong id="visual-bf-current">—</strong></p>
+      <p>Estado: <strong id="visual-bf-state">Pronto</strong></p>
+      <p>Resultado: <strong id="visual-bf-result">—</strong></p>
+    </section>
+
+    <section class="algorithm-card algorithm-card-divide" aria-labelledby="visual-divide-title">
+      <h3 id="visual-divide-title">Divisão e conquista <span class="legend-blue">●</span></h3>
+      <p>Comparações exibidas: <strong id="visual-dc-checks">0</strong></p>
+      <p>Par atual: <strong id="visual-dc-current">—</strong></p>
+      <p>Estado: <strong id="visual-dc-state">Pronto</strong></p>
+      <p>Resultado: <strong id="visual-dc-result">—</strong></p>
+    </section>
+  </div>
+
+  <p class="comparison-note">
+    Uma verificação de distância por algoritmo a cada avanço. Os tempos reais são medidos separadamente.
+  </p>
+</section>
+
+<section class="results" aria-live="polite">
+      <p id="status">Escolha um cenário e execute o algoritmo.</p>
+
+      <dl>
+        <div>
+          <dt>Par mais próximo</dt>
+          <dd id="pair">—</dd>
+        </div>
+
+        <div>
+          <dt>Distância</dt>
+          <dd id="distance">—</dd>
+        </div>
+
+        <div>
+          <dt>Verificações de distância</dt>
+          <dd id="checks">—</dd>
+        </div>
+
+        <div>
+          <dt>Profundidade máxima</dt>
+          <dd id="depth">—</dd>
+        </div>
+      </dl>
+
+    </section>
+
+    <section class="results" aria-labelledby="benchmark-title">
+  <h2 id="benchmark-title">Comparação de algoritmos</h2>
+
+  <p id="benchmark-status" aria-live="polite">
+    Execute a comparação para consultar os resultados.
+  </p>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Algoritmo</th>
+          <th scope="col">Distância mínima</th>
+          <th scope="col">Verificações</th>
+          <th scope="col">Tempo mediano</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <th scope="row">Força bruta — referência local</th>
+          <td id="bf-distance">—</td>
+          <td id="bf-checks">—</td>
+          <td id="bf-time">—</td>
+        </tr>
+
+        <tr>
+          <th scope="row">Divisão e conquista</th>
+          <td id="dc-distance">—</td>
+          <td id="dc-checks">—</td>
+          <td id="dc-time">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="benchmark-note">
+    Medição local, sem desenho ou gravação de passos.
+    Tempos muito pequenos podem variar entre execuções.
+  </p>
+</section>
+  </main>
+
+  <script type="module" src="./src/labEntry.js"></script>
+</body>
+</html>
