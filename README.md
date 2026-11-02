@@ -1,0 +1,1 @@
+# G19_Dividir-e-Conquistar_PA-26.2
