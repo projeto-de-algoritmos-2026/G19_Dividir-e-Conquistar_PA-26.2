@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arena de Encontros</title>
+  <link rel="stylesheet" href="./styles/arena.css">
+</head>
+<body>
+  <main class="arena-app">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Projeto de Algoritmos · Dividir e Conquistar</p>
+        <h1>Arena de Encontros</h1>
+        <p class="intro">
+          Acompanhe personagens em movimento e descubra, em tempo real,
+          qual par está mais próximo.
+        </p>
+      </div>
+      <a class="lab-link" href="./algorithm-lab.html">Laboratório independente</a>
+    </header>
+
+    <section class="panel controls" aria-label="Controles da simulação">
+      <div class="control-group">
+        <label for="character-count">Personagens</label>
+        <input id="character-count" type="number" min="0" max="500" value="30">
+      </div>
+      <div class="control-group">
+        <label for="seed">Semente</label>
+        <input id="seed" type="number" value="123456789">
+      </div>
+      <button id="generate" type="button">Gerar arena</button>
+      <button id="add-character" type="button" class="secondary">Adicionar personagem</button>
+      <button id="start-pause" type="button">Iniciar</button>
+      <button id="reset" type="button" class="secondary">Reiniciar</button>
+
+      <div class="control-group range-control">
+        <label for="speed">Velocidade <output id="speed-value">1.00×</output></label>
+        <input id="speed" type="range" min="0.25" max="3" value="1" step="0.25">
+      </div>
+      <div class="control-group">
+        <label for="encounter-limit">Distância de encontro (px)</label>
+        <input id="encounter-limit" type="number" min="0" max="300" value="45">
+      </div>
+      <div class="control-group">
+        <label for="algorithm">Algoritmo ao vivo</label>
+        <select id="algorithm">
+          <option value="divideConquer">Divisão e conquista</option>
+          <option value="bruteForce">Força bruta</option>
+        </select>
+      </div>
+      <button id="open-lab" type="button" class="secondary">
+        Abrir laboratório com esta arena
+      </button>
+    </section>
+
+    <section class="arena-panel panel" aria-label="Arena de personagens">
+      <canvas
+        id="arena"
+        width="960"
+        height="560"
+        aria-label="Personagens na arena; pause para arrastá-los"
+      ></canvas>
+      <p class="canvas-hint">
+        Pause a simulação para arrastar personagens. A linha laranja marca
+        o par mais próximo; verde indica um encontro ativo.
+      </p>
+    </section>
+
+    <section class="panel results" aria-label="Resultado em tempo real">
+      <div>
+        <span class="result-label">Estado</span>
+        <p id="status" role="status">Preparando arena…</p>
+      </div>
+      <div>
+        <span class="result-label">Encontro</span>
+        <p id="encounter-status" aria-live="polite">Nenhum encontro ativo.</p>
+      </div>
+      <div class="metric">
+        <span class="result-label">Personagens</span>
+        <strong id="character-total">0</strong>
+      </div>
+      <div class="metric">
+        <span class="result-label">Par mais próximo</span>
+        <strong id="pair">—</strong>
+      </div>
+      <div class="metric">
+        <span class="result-label">Distância</span>
+        <strong id="distance">—</strong>
+      </div>
+      <div class="metric">
+        <span class="result-label">Verificações</span>
+        <strong id="checks">0</strong>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        O modo didático recebe um snapshot congelado desta arena e compara a
+        força bruta com a solução por divisão e conquista.
+      </p>
+    </footer>
+  </main>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

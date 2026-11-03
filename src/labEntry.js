@@ -2,6 +2,9 @@ import {
   findClosestPairDivideConquer
 } from "./algorithms/closestPair.js";
 import {
+  findClosestPairBruteForce
+} from "./algorithms/bruteForceClosestPair.js";
+import {
   getScenario,
   generateRandomPoints
 } from "./lab/fixtures.js";
@@ -37,6 +40,7 @@ const elements = {
   benchmark: document.querySelector("#benchmark"),
   benchmarkStatus: document.querySelector("#benchmark-status"),
   bfDistance: document.querySelector("#bf-distance"),
+  bfAlgorithmLabel: document.querySelector("#bf-algorithm-label"),
   bfChecks: document.querySelector("#bf-checks"),
   bfTime: document.querySelector("#bf-time"),
   dcDistance: document.querySelector("#dc-distance"),
@@ -61,7 +65,7 @@ const requiredElements = [
   "canvas", "scenario", "run", "stepReset", "stepBack", "stepNext",
   "stepPlay", "stepCounter", "stepDescription", "status", "pair",
   "distance", "checks", "depth", "pointCount", "generate", "benchmark",
-  "benchmarkStatus", "bfDistance", "bfChecks", "bfTime", "dcDistance",
+  "benchmarkStatus", "bfDistance", "bfAlgorithmLabel", "bfChecks", "bfTime", "dcDistance",
   "dcChecks", "dcTime", "visualCompare", "comparisonReset",
   "comparisonPlay", "comparisonSpeed", "comparisonStatus",
   "visualBfChecks", "visualBfCurrent", "visualBfState", "visualBfResult",
@@ -82,7 +86,52 @@ if (
 }
 
 const comparisonLimit = 30;
-let points = getScenario(elements.scenario.value);
+function loadArenaSnapshot() {
+  if (new URLSearchParams(window.location.search).get("source") !== "arena") {
+    return null;
+  }
+
+  const serialized = sessionStorage.getItem("arena-lab-snapshot");
+
+  if (serialized === null) {
+    throw new Error("O snapshot enviado pela arena não foi encontrado.");
+  }
+
+  const snapshot = JSON.parse(serialized);
+
+  if (!Array.isArray(snapshot)) {
+    throw new TypeError("O snapshot da arena é inválido.");
+  }
+
+  const ids = new Set();
+
+  for (const point of snapshot) {
+    if (
+      point === null ||
+      typeof point !== "object" ||
+      typeof point.id !== "string" ||
+      !Number.isFinite(point.x) ||
+      !Number.isFinite(point.y) ||
+      ids.has(point.id)
+    ) {
+      throw new TypeError("O snapshot contém pontos inválidos.");
+    }
+
+    ids.add(point.id);
+  }
+
+  sessionStorage.removeItem("arena-lab-snapshot");
+  return snapshot.map(point => ({ ...point }));
+}
+
+const arenaSnapshot = loadArenaSnapshot();
+const bruteForceAlgorithm = arenaSnapshot
+  ? findClosestPairBruteForce
+  : findClosestPairReference;
+elements.bfAlgorithmLabel.textContent = arenaSnapshot
+  ? "Força bruta — algoritmo oficial"
+  : "Força bruta — referência local";
+let points = arenaSnapshot ?? getScenario(elements.scenario.value);
 let generationSeed = 123456789;
 let result = null;
 let comparisonResults = null;
@@ -115,16 +164,22 @@ function describeStep(step) {
     return "Execute o algoritmo para visualizar suas etapas.";
   }
 
-  const descriptions = {
-    start: "Pontos carregados. O algoritmo começa a procurar o par mais próximo.",
-    divide: "Dividindo os pontos em duas metades.",
-    compare: `Comparando o par ${step.pair.join(" e ")}.`,
-    best: `Novo melhor par: ${step.pair.join(" e ")}.`,
-    strip: "Verificando a faixa central entre as duas metades.",
-    finish: "Execução concluída."
-  };
-
-  return descriptions[step.type] ?? "Etapa do algoritmo.";
+  switch (step.type) {
+    case "start":
+      return "Pontos carregados. O algoritmo começa a procurar o par mais próximo.";
+    case "divide":
+      return "Dividindo os pontos em duas metades.";
+    case "compare":
+      return `Comparando o par ${step.pair.join(" e ")}.`;
+    case "best":
+      return `Novo melhor par: ${step.pair.join(" e ")}.`;
+    case "strip":
+      return "Verificando a faixa central entre as duas metades.";
+    case "finish":
+      return "Execução concluída.";
+    default:
+      return "Etapa do algoritmo.";
+  }
 }
 
 function updateDidacticView({
@@ -236,7 +291,7 @@ function startComparison() {
 
   const snapshot = copyPoints(points);
   comparisonResults = {
-    bruteForce: findClosestPairReference(snapshot, {
+    bruteForce: bruteForceAlgorithm(snapshot, {
       recordSteps: true
     }),
     divideConquer: findClosestPairDivideConquer(snapshot, {
@@ -334,7 +389,7 @@ function compareAlgorithms() {
   try {
     const report = runBenchmark(points, {
       algorithms: {
-        bruteForce: findClosestPairReference,
+        bruteForce: bruteForceAlgorithm,
         divideConquer: findClosestPairDivideConquer
       },
       warmups: 3,
@@ -384,4 +439,10 @@ window.addEventListener("beforeunload", () => {
   comparisonPlayer.destroy();
 });
 
-loadScenario();
+if (arenaSnapshot) {
+  drawLab(elements.canvas, points);
+  elements.status.textContent =
+    `Snapshot da arena carregado com ${points.length} personagens.`;
+} else {
+  loadScenario();
+}

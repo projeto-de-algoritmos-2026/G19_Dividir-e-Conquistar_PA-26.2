@@ -19,6 +19,12 @@ header p {
   color: #94a3b8;
 }
 
+.arena-return {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #a5b4fc;
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
