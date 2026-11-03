@@ -16,9 +16,7 @@ para visualizar e comparar os algoritmos de força bruta e divisão e conquista.
 
 ## Vídeo de Apresentação
 
-[![Assistir ao vídeo de apresentação]()]()
-
-LINK: 
+[![Assistir ao vídeo de apresentação](https://img.youtube.com/vi/sHJGRicwY58/hqdefault.jpg)](https://www.youtube.com/watch?v=sHJGRicwY58)
 
 ---
 
